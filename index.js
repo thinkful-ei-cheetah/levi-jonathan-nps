@@ -1,8 +1,6 @@
 const apiKey = 'U1Cym6cqJQtbgczuQblUY3RZNylzxISntWhrWWDc'; 
 const searchURL = 'https://developer.nps.gov/api/v1/parks';
 
-
-// https://developer.nps.gov/api/v1/parks?parkCode=&stateCode=MA&api_key=U1Cym6cqJQtbgczuQblUY3RZNylzxISntWhrWWDc
 function formatQueryParams(params) {
     const queryItems = Object.keys(params)
       .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
@@ -10,13 +8,12 @@ function formatQueryParams(params) {
   }
 
 function getParks(params, maxResults=10) {
-    const queryString = formatQueryParams(params)
-    const url = searchURL + '?' + queryString + '&limit=' + maxResults + '&api_key='+apiKey;
-    console.log(url);
+    const queryString = formatQueryParams(params); 
+    const formattedQueryString = queryString.split('%20').join('');
+    const url = searchURL + '?' + formattedQueryString + '&limit=' + (maxResults-1) + '&api_key='+apiKey;
   
     fetch(url)
       .then(response => {
-        // the new code starts here
         if (response.ok) {
           return response.json();
         }
@@ -29,22 +26,14 @@ function getParks(params, maxResults=10) {
   }
 
 function displayResults(responseJson) {
-    // if there are previous results, remove them
-    console.log(responseJson);
     $('#results-list').empty();
-    // iterate through the items array
     for (let i = 0; i < responseJson.data.length; i++){
-      // for each video object in the items 
-      //array, add a list item to the results 
-      //list with the video title, description,
-      //and thumbnail
       $('#results-list').append(
-        `<li><h3>${responseJson.items[i].snippet.title}</h3>
-        <p>${responseJson.items[i].snippet.description}</p>
-        <img src='${responseJson.items[i].snippet.thumbnails.default.url}'>
+        `<li><h3>${responseJson.data[i].fullName}</h3>
+        <p>${responseJson.data[i].url}</p>
+        <p>${responseJson.data[i].description}</p>
         </li>`
       )};
-    //display the results section  
     $('#results').removeClass('hidden');
   };
 
@@ -60,7 +49,3 @@ function watchForm() {
   }
   
   $(watchForm);
-// data.
-  // fullName
-  // description
-  // url
